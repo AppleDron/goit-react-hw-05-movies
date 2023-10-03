@@ -1,27 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { searchMovie } from 'services/themoviedbAPI';
+import Notiflix from 'notiflix';
 
 const MoviesPage = () => {
   const [filmList, setFilmList] = useState([]);
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
+  const movieName = searchParams.get('query') ?? '';
+  const [searchQuery, setSearchQuery] = useState(movieName ? movieName : '');
 
   useEffect(() => {
-    const query = searchParams.get('query');
-    if (query) {
-      searchMovie(query)
+    if (searchQuery) {
+      searchMovie(searchQuery)
         .then(response => {
+          if (!searchQuery) {
+            return;
+          }
           setFilmList(response.data.results);
         })
         .catch(error => {
-          console.error('Error fetching movie results:', error);
+          Notiflix.Notify.failure(error);
         });
     }
-  }, [searchParams]);
+  }, [searchQuery]);
 
   const handleSubmit = e => {
     e.preventDefault();
+    let formValue = e.target.searchQuery.value;
+    if (formValue === '') return;
+    setSearchQuery(formValue);
+    e.target.searchQuery.value = '';
   };
 
   return (
@@ -32,6 +41,7 @@ const MoviesPage = () => {
           name="searchQuery"
           onChange={e => setSearchParams({ query: e.target.value })}
         />
+        <button type="submit">Search</button>
       </form>
 
       <ul>

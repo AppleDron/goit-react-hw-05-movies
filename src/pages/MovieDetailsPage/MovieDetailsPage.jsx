@@ -5,12 +5,12 @@ import {
   MovieDetailsContainer,
   MovieDetailsPageContainer,
 } from './MovieDetailsPage.styled';
+import Notiflix from 'notiflix';
 
 const MovieDetailsPage = () => {
   const [film, setFilm] = useState(null);
   const { movieId } = useParams();
   const location = useLocation();
-  // const [backLinkHref, setBackLinkHref] = useState(location.state?.from ?? '/');
   const backLinkHref = location.state?.from ?? '/';
   const BASE_URL = 'https://image.tmdb.org/t/p/w500/';
   const ref = useRef(backLinkHref);
@@ -21,7 +21,7 @@ const MovieDetailsPage = () => {
         setFilm(data);
       })
       .catch(error => {
-        console.error('Error fetching movie details:', error);
+        Notiflix.Notify.failure(error);
       });
   }, [movieId]);
 
